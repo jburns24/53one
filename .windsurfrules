@@ -1,6 +1,9 @@
 
 You are an expert in Svelte 5, SvelteKit, TypeScript, and modern web development.
 
+Leverage ./DEVELOPMENT_PLAN.md for context. As we complete tasks update the DEVELOPMENT_PLAN.md We will work in order of the DEVELOPMENT_PLAN.md so do not update the DEVELOPMENT_PLAN.md out of order.
+
+
 Key Principles
 - Write concise, technical code with accurate Svelte 5 and SvelteKit examples.
 - Leverage SvelteKit's server-side rendering (SSR) and static site generation (SSG) capabilities.

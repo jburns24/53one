@@ -1,64 +1,50 @@
 <script lang="ts">
   import { page } from '$app/stores';
+  import '../app.css';
 </script>
 
 <svelte:head>
   <title>53one - Workout Planner</title>
   <meta name="description" content="Track your lifts and get personalized workout plans" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 </svelte:head>
 
-<div class="app">
-  <header class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container">
-      <a class="navbar-brand" href="/">53one</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto">
-          {#if $page.data.session?.user}
-            <li class="nav-item">
-              <a class="nav-link" href="/dashboard">Dashboard</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/workout-data">My Lifts</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/schedule">My Schedule</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/auth/signout">Sign Out</a>
-            </li>
-          {:else}
-            <li class="nav-item">
-              <a class="nav-link" href="/auth/signin">Sign In</a>
-            </li>
-          {/if}
-        </ul>
+<div class="flex flex-col min-h-screen">
+  <header class="bg-primary text-primary-foreground">
+    <div class="container mx-auto px-4">
+      <div class="flex items-center justify-between h-16">
+        <a href="/" class="text-xl font-bold">53one</a>
+        
+        <div class="hidden md:block">
+          <div class="flex items-center space-x-4">
+            {#if $page.data.session?.user}
+              <a href="/dashboard" class="px-3 py-2 hover:bg-primary-foreground/10 rounded-md">Dashboard</a>
+              <a href="/workout-data" class="px-3 py-2 hover:bg-primary-foreground/10 rounded-md">My Lifts</a>
+              <a href="/schedule" class="px-3 py-2 hover:bg-primary-foreground/10 rounded-md">My Schedule</a>
+              <a href="/auth/signout" class="px-3 py-2 hover:bg-primary-foreground/10 rounded-md">Sign Out</a>
+            {:else}
+              <a href="/auth/signin" class="px-3 py-2 hover:bg-primary-foreground/10 rounded-md">Sign In</a>
+            {/if}
+          </div>
+        </div>
+        
+        <div class="md:hidden">
+          <button type="button" class="text-primary-foreground" aria-label="Toggle menu">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+            </svg>
+          </button>
+        </div>
       </div>
     </div>
   </header>
 
-  <main class="container py-4">
+  <main class="flex-1">
     <slot />
   </main>
 
-  <footer class="bg-light py-3 mt-5">
-    <div class="container text-center">
-      <p class="mb-0">© {new Date().getFullYear()} 53one. All rights reserved.</p>
+  <footer class="bg-muted py-6">
+    <div class="container mx-auto px-4 text-center">
+      <p class="text-muted-foreground">© {new Date().getFullYear()} 53one. All rights reserved.</p>
     </div>
   </footer>
 </div>
-
-<style>
-  .app {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-  }
-
-  main {
-    flex: 1;
-  }
-</style>
