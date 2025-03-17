@@ -118,7 +118,8 @@ function generate531WorkoutPlan(trainingMaxes: { squat: number; bench: number; d
           weight,
           reps: week === 3 ? (percentage === 0.75 ? 5 : percentage === 0.85 ? 3 : 1) : 
                 week === 4 ? 5 : // Deload week
-                5 // Weeks 1 and 2
+                week === 2 ? 3 : // Week 2: 3 reps
+                5 // Week 1: 5 reps
         };
       });
       

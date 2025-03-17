@@ -110,7 +110,7 @@
                   <tr class="border-b border-border">
                     <td class="px-4 py-3">{i + 1}</td>
                     <td class="px-4 py-3 font-bold">{set.weight}</td>
-                    <td class="px-4 py-3">{set.reps}+</td>
+                    <td class="px-4 py-3">{set.reps}{i === currentWorkout.mainLift.sets.length - 1 ? '+' : ''}</td>
                     <td class="px-4 py-3 text-muted-foreground">{(set.percentage * 100).toFixed(0)}%</td>
                   </tr>
                 {/each}

@@ -20,12 +20,12 @@
       <nav class="flex items-center gap-6">
         <a href="/dashboard" class="text-foreground hover:text-primary transition-colors">Dashboard</a>
         <a href="/dashboard/1rm" class="text-foreground hover:text-primary transition-colors">1RM</a>
+        <a href="/dashboard/workouts" class="text-foreground hover:text-primary transition-colors">Workouts</a>
         
         {#if user}
           <div class="flex items-center gap-3">
-            <div class="flex flex-col text-sm">
-              <span class="font-medium">{user.name}</span>
-              <span class="text-muted-foreground">{user.email}</span>
+            <div class="text-sm font-medium">
+              {user.name}
             </div>
             <button 
               on:click={() => signOut()} 
