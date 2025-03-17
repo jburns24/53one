@@ -1,6 +1,7 @@
 <script lang="ts">
   import { page } from '$app/stores';
   import '../app.css';
+  import ThemeToggle from '$lib/components/ThemeToggle.svelte';
 </script>
 
 <svelte:head>
@@ -14,6 +15,10 @@
     <div class="container mx-auto px-4">
       <div class="flex items-center justify-between h-16">
         <a href="/" class="text-xl font-bold">53one</a>
+        
+        <div class="hidden md:flex items-center space-x-4">
+          <ThemeToggle />
+        </div>
         
         <div class="hidden md:block">
           <div class="flex items-center space-x-4">

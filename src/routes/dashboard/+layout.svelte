@@ -2,6 +2,7 @@
   import { page } from '$app/stores';
   import { signOut } from '@auth/sveltekit/client';
   import type { LayoutData } from './$types';
+  import ThemeToggle from '$lib/components/ThemeToggle.svelte';
   
   // Use export let for now since we're having issues with $props and slots
   export let data: LayoutData;
@@ -21,6 +22,7 @@
         <a href="/dashboard" class="text-foreground hover:text-primary transition-colors">Dashboard</a>
         <a href="/dashboard/1rm" class="text-foreground hover:text-primary transition-colors">1RM</a>
         <a href="/dashboard/workouts" class="text-foreground hover:text-primary transition-colors">Workouts</a>
+        <ThemeToggle />
         
         {#if user}
           <div class="flex items-center gap-3">
