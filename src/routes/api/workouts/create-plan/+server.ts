@@ -1,5 +1,6 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { clientPromise } from '$lib/server/mongodb';
 
 export const POST: RequestHandler = async ({ request, locals }) => {
   // Get the current user session
@@ -34,29 +35,34 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     // Generate the 4-week workout plan
     const workoutPlan = generate531WorkoutPlan(trainingMaxes);
     
-    // In a real implementation, you would save this data to the database
-    // await db.collection('userMaxes').updateOne(
-    //   { userId: session.user.id },
-    //   { 
-    //     $set: { 
-    //       squat, bench, deadlift, press,
-    //       trainingMaxes,
-    //       updatedAt: new Date()
-    //     }
-    //   },
-    //   { upsert: true }
-    // );
-    // 
-    // await db.collection('workoutPlans').updateOne(
-    //   { userId: session.user.id },
-    //   { 
-    //     $set: { 
-    //       plan: workoutPlan,
-    //       createdAt: new Date()
-    //     }
-    //   },
-    //   { upsert: true }
-    // );
+    // Connect to MongoDB and save the data
+    const client = await clientPromise;
+    const db = client.db();
+    
+    // Save user's 1RM values and training maxes
+    await db.collection('userMaxes').updateOne(
+      { userId: session.user.id },
+      { 
+        $set: { 
+          squat, bench, deadlift, press,
+          trainingMaxes,
+          updatedAt: new Date()
+        }
+      },
+      { upsert: true }
+    );
+    
+    // Save the generated workout plan
+    await db.collection('workoutPlans').updateOne(
+      { userId: session.user.id },
+      { 
+        $set: { 
+          plan: workoutPlan,
+          createdAt: new Date()
+        }
+      },
+      { upsert: true }
+    );
     
     return json({ 
       success: true, 

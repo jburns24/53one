@@ -14,14 +14,15 @@ declare global {
   var _mongoClientPromise: Promise<MongoClient> | undefined;
 }
 
-// Configure MongoDB connection options to handle SSL/TLS issues
+// Configure MongoDB connection options to handle connection issues
 const options = {
-  ssl: true,
-  sslValidate: false, // In development, you might want to disable SSL validation
   connectTimeoutMS: 30000, // Increase connection timeout
   socketTimeoutMS: 30000, // Increase socket timeout
   retryWrites: true,
-  retryReads: true
+  retryReads: true,
+  // Use the tls option for SSL/TLS configuration
+  tls: true,
+  tlsAllowInvalidCertificates: process.env.NODE_ENV === 'development'
 };
 
 if (process.env.NODE_ENV === 'development') {
