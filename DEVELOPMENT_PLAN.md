@@ -77,9 +77,6 @@
 
 ## User Interface - In Progress
 - [x] Create landing page
-- [ ] Design login page
-- [ ] Implement protected routes
-- [ ] Create navigation components
 - [x] Design responsive layout with Tailwind CSS
 
 ## Workout Data Input - To Do

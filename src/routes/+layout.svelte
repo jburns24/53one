@@ -9,6 +9,7 @@
 </svelte:head>
 
 <div class="flex flex-col min-h-screen">
+  {#if !$page.url.pathname.startsWith('/dashboard')}
   <header class="bg-primary text-primary-foreground">
     <div class="container mx-auto px-4">
       <div class="flex items-center justify-between h-16">
@@ -37,6 +38,7 @@
       </div>
     </div>
   </header>
+  {/if}
 
   <main class="flex-1">
     <slot />
