@@ -19,6 +19,22 @@ export const load: PageServerLoad = async ({ locals }) => {
     const userMaxes = await db.collection('userMaxes').findOne({ userId: session.user.id });
     const workoutPlan = await db.collection('workoutPlans').findOne({ userId: session.user.id });
     
+    // Fetch workout progress data
+    const progressData = await db.collection('workoutProgress')
+      .find({ userId: session.user.id })
+      .toArray();
+      
+    // Convert MongoDB documents to plain JavaScript objects to avoid serialization issues
+    const serializedProgressData = progressData.map(item => ({
+      userId: item.userId,
+      week: item.week,
+      day: item.day,
+      mainLift: item.mainLift,
+      setIndex: item.setIndex,
+      completed: item.completed,
+      updatedAt: item.updatedAt ? item.updatedAt.toISOString() : null
+    }));
+    
     // If no workout plan exists, redirect to the 1RM page
     if (!userMaxes || !workoutPlan) {
       throw redirect(303, '/dashboard/1rm');
@@ -27,7 +43,8 @@ export const load: PageServerLoad = async ({ locals }) => {
     // Return the data from MongoDB
     return {
       trainingMaxes: userMaxes.trainingMaxes,
-      weeks: workoutPlan.plan
+      weeks: workoutPlan.plan,
+      progress: serializedProgressData
     };
   } catch (error) {
     console.error('Error fetching workout data:', error);
