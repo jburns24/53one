@@ -11,6 +11,14 @@
     weeks: data.weeks
   };
   
+  // Calculate 1RM values from training maxes (TM is 90% of 1RM)
+  const oneRepMaxes = {
+    squat: Math.round(workoutPlan.trainingMaxes.squat / 0.9),
+    bench: Math.round(workoutPlan.trainingMaxes.bench / 0.9),
+    deadlift: Math.round(workoutPlan.trainingMaxes.deadlift / 0.9),
+    press: Math.round(workoutPlan.trainingMaxes.press / 0.9)
+  };
+  
   // Use a plain object for tracking completed sets
   let completedSets: Record<string, boolean> = {};
   
@@ -114,20 +122,56 @@
   
   <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
     <div class="bg-card rounded-lg p-4 border border-border">
-      <h3 class="font-medium text-muted-foreground mb-1">Squat TM</h3>
-      <p class="text-2xl font-bold">{workoutPlan.trainingMaxes.squat} lbs</p>
+      <h3 class="font-medium mb-1">Squat</h3>
+      <div class="flex flex-col gap-1">
+        <div>
+          <p class="text-2xl font-bold">{oneRepMaxes.squat} lbs</p>
+          <p class="text-xs text-muted-foreground">1 Rep Max</p>
+        </div>
+        <div class="mt-2 pt-2 border-t border-border">
+          <p class="text-lg font-medium">{workoutPlan.trainingMaxes.squat} lbs</p>
+          <p class="text-xs text-muted-foreground">Training Max (90%)</p>
+        </div>
+      </div>
     </div>
     <div class="bg-card rounded-lg p-4 border border-border">
-      <h3 class="font-medium text-muted-foreground mb-1">Bench TM</h3>
-      <p class="text-2xl font-bold">{workoutPlan.trainingMaxes.bench} lbs</p>
+      <h3 class="font-medium mb-1">Bench Press</h3>
+      <div class="flex flex-col gap-1">
+        <div>
+          <p class="text-2xl font-bold">{oneRepMaxes.bench} lbs</p>
+          <p class="text-xs text-muted-foreground">1 Rep Max</p>
+        </div>
+        <div class="mt-2 pt-2 border-t border-border">
+          <p class="text-lg font-medium">{workoutPlan.trainingMaxes.bench} lbs</p>
+          <p class="text-xs text-muted-foreground">Training Max (90%)</p>
+        </div>
+      </div>
     </div>
     <div class="bg-card rounded-lg p-4 border border-border">
-      <h3 class="font-medium text-muted-foreground mb-1">Deadlift TM</h3>
-      <p class="text-2xl font-bold">{workoutPlan.trainingMaxes.deadlift} lbs</p>
+      <h3 class="font-medium mb-1">Deadlift</h3>
+      <div class="flex flex-col gap-1">
+        <div>
+          <p class="text-2xl font-bold">{oneRepMaxes.deadlift} lbs</p>
+          <p class="text-xs text-muted-foreground">1 Rep Max</p>
+        </div>
+        <div class="mt-2 pt-2 border-t border-border">
+          <p class="text-lg font-medium">{workoutPlan.trainingMaxes.deadlift} lbs</p>
+          <p class="text-xs text-muted-foreground">Training Max (90%)</p>
+        </div>
+      </div>
     </div>
     <div class="bg-card rounded-lg p-4 border border-border">
-      <h3 class="font-medium text-muted-foreground mb-1">Press TM</h3>
-      <p class="text-2xl font-bold">{workoutPlan.trainingMaxes.press} lbs</p>
+      <h3 class="font-medium mb-1">Overhead Press</h3>
+      <div class="flex flex-col gap-1">
+        <div>
+          <p class="text-2xl font-bold">{oneRepMaxes.press} lbs</p>
+          <p class="text-xs text-muted-foreground">1 Rep Max</p>
+        </div>
+        <div class="mt-2 pt-2 border-t border-border">
+          <p class="text-lg font-medium">{workoutPlan.trainingMaxes.press} lbs</p>
+          <p class="text-xs text-muted-foreground">Training Max (90%)</p>
+        </div>
+      </div>
     </div>
   </div>
   
