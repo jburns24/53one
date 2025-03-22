@@ -106,7 +106,7 @@
 ## Progress Tracking - In Progress ✅
 - [x] Implement progress tracking
 - [x] Add workout completion feature with AMRAP tracking
-- [ ] Add visualization for workout history
+- [x] Add visualization for workout history
 - [ ] Create settings page for user preferences
 
 ## Testing - To Do
@@ -134,4 +134,11 @@ The application now has a fully functional workout planning system based on the 
 
 Progress tracking has been implemented, allowing users to mark sets as completed. When all main lift sets are completed, a "Workout Complete" button appears, prompting users to enter the number of reps they performed on their AMRAP set. Once a workout is completed, the interface locks to prevent further changes and displays the recorded AMRAP reps.
 
-Dark mode has been implemented for better user experience. The next steps include implementing workout history visualization and creating a settings page for user preferences.
+The dashboard page has been repurposed to show workout history visualization, including:
+1. A line chart tracking 1RM progress for each main lift over time
+2. Personal records (PRs) display showing the most weight for the most reps recorded for each lift
+3. Theoretical total calculation (sum of estimated 1RMs across all lifts)
+
+The cycle completion logic has been updated to evaluate each lift individually based on AMRAP performance, allowing for selective weight increases. The completion dialog now visually indicates which lifts will increase and which will not using color coding.
+
+Dark mode has been implemented for better user experience. The next step is to create a settings page for user preferences.

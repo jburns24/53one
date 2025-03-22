@@ -62,6 +62,12 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         $set: { 
           plan: workoutPlan,
           planId: planId,
+          oneRepMaxes: {
+            squat,
+            bench,
+            deadlift,
+            press
+          },
           createdAt: new Date()
         }
       },

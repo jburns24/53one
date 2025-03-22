@@ -19,9 +19,24 @@
       </div>
       
       <nav class="flex items-center gap-6">
-        <a href="/dashboard" class="text-foreground hover:text-primary transition-colors">Dashboard</a>
-        <a href="/dashboard/1rm" class="text-foreground hover:text-primary transition-colors">1RM</a>
-        <a href="/dashboard/workouts" class="text-foreground hover:text-primary transition-colors">Workouts</a>
+        <a 
+          href="/dashboard" 
+          class="{$page.url.pathname === '/dashboard' ? 'text-primary font-medium' : 'text-foreground'} hover:text-primary transition-colors"
+        >
+          History
+        </a>
+        <a 
+          href="/dashboard/1rm" 
+          class="{$page.url.pathname === '/dashboard/1rm' ? 'text-primary font-medium' : 'text-foreground'} hover:text-primary transition-colors"
+        >
+          1RM
+        </a>
+        <a 
+          href="/dashboard/workouts" 
+          class="{$page.url.pathname === '/dashboard/workouts' ? 'text-primary font-medium' : 'text-foreground'} hover:text-primary transition-colors"
+        >
+          Workouts
+        </a>
         <ThemeToggle />
         
         {#if user}

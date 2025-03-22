@@ -316,7 +316,8 @@
     const workoutKey = `${currentWeek}-${currentDay}`;
     
     try {
-      const response = await fetch('/api/workouts/track-progress', {
+      // First, save the progress tracking information
+      const progressResponse = await fetch('/api/workouts/track-progress', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -333,9 +334,43 @@
         })
       });
       
-      const result = await response.json();
+      const progressResult = await progressResponse.json();
       
-      if (result.success) {
+      if (progressResult.success) {
+        // Now save the completed workout with all set information for PR calculations
+        // Create a copy of the sets with the AMRAP reps updated
+        const updatedSets = currentWorkout.mainLift.sets.map((set: { weight: number, reps: number }, index: number) => {
+          if (index === getAmrapSetIndex()) {
+            return { ...set, reps: amrapRepsInput };
+          }
+          return set;
+        });
+        
+        // Save the completed workout with all set information
+        const completedResponse = await fetch('/api/workouts/save-completed', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            workout: {
+              mainLift: {
+                name: currentWorkout.mainLift.name,
+                trainingMax: currentWorkout.mainLift.trainingMax
+              },
+              sets: updatedSets
+            },
+            planId: currentPlanId,
+            completedAt: new Date().toISOString()
+          })
+        });
+        
+        const completedResult = await completedResponse.json();
+        
+        if (!completedResult.success) {
+          console.error('Failed to save completed workout for PR tracking');
+        }
+        
         // Update local state
         amrapReps = { ...amrapReps, [amrapKey]: amrapRepsInput };
         workoutCompleted = { ...workoutCompleted, [workoutKey]: true };
