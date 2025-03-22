@@ -92,8 +92,16 @@
     return true;
   }
   
-  // Function to check if all AMRAP sets met minimum requirements
-  function didMeetAllAmrapMinimums(): boolean {
+  // Track which lifts met their AMRAP requirements
+  let liftSuccess: Record<string, boolean> = {
+    squat: true,
+    bench: true,
+    deadlift: true,
+    press: true
+  };
+
+  // Function to check if a specific lift met all its AMRAP requirements
+  function didLiftMeetAmrapMinimums(liftName: string): boolean {
     // Week 1: 5+ sets, Week 2: 3+ sets, Week 3: 1+ sets
     // Week 4 is deload, no AMRAP sets to check
     const minimumReps: Record<number, number> = {
@@ -102,20 +110,17 @@
       3: 1  // Week 3: 1+ sets
     };
     
-    // Check all main lifts for weeks 1-3
-    const mainLifts = ['squat', 'bench', 'deadlift', 'press'];
-    
     for (let week = 1; week <= 3; week++) {
       for (let day = 1; day <= 4; day++) {
         // Get the workout for this week/day
         const workout = workoutPlan.weeks?.[week - 1]?.workouts?.[day - 1];
         if (!workout) continue;
         
-        // Get the main lift name
-        const mainLift = workout.mainLift.name;
+        // Skip if this workout doesn't involve the lift we're checking
+        if (workout.mainLift.name !== liftName) continue;
         
         // Get AMRAP reps for this workout
-        const reps = getAmrapReps(week, day, mainLift);
+        const reps = getAmrapReps(week, day, liftName);
         
         // If no reps recorded or less than minimum, return false
         if (reps === null || reps < minimumReps[week]) {
@@ -125,6 +130,20 @@
     }
     
     return true;
+  }
+  
+  // Function to check if all AMRAP sets met minimum requirements
+  function didMeetAllAmrapMinimums(): boolean {
+    // Check all main lifts
+    const mainLifts = ['squat', 'bench', 'deadlift', 'press'];
+    
+    // Update the success status for each lift
+    mainLifts.forEach(lift => {
+      liftSuccess[lift] = didLiftMeetAmrapMinimums(lift);
+    });
+    
+    // Return true if at least one lift met its requirements
+    return Object.values(liftSuccess).some(success => success);
   }
   
   // Function to get failed AMRAP workouts
@@ -349,14 +368,14 @@
     }
   }
   
-  // Function to generate a new workout plan with increased 1RM values
+  // Function to generate a new workout plan with selectively increased 1RM values
   function generateNewWorkoutPlan() {
-    // Calculate new 1RM values (add 10lbs to squat and deadlift, 5lbs to bench and press)
+    // Calculate new 1RM values based on which lifts met their requirements
     const newOneRepMaxes = {
-      squat: oneRepMaxes.squat + 10,
-      bench: oneRepMaxes.bench + 5,
-      deadlift: oneRepMaxes.deadlift + 10,
-      press: oneRepMaxes.press + 5
+      squat: oneRepMaxes.squat + (liftSuccess.squat ? 10 : 0),
+      bench: oneRepMaxes.bench + (liftSuccess.bench ? 5 : 0),
+      deadlift: oneRepMaxes.deadlift + (liftSuccess.deadlift ? 10 : 0),
+      press: oneRepMaxes.press + (liftSuccess.press ? 5 : 0)
     };
     
     // Redirect to 1RM page with new values
@@ -793,71 +812,79 @@
     <div class="bg-white dark:bg-card text-black dark:text-card-foreground p-6 rounded-lg shadow-xl max-w-lg w-full border-2 border-primary/20">
       <h3 class="text-xl font-bold mb-4 text-primary">Workout Cycle Completed!</h3>
       
-      {#if cycleSuccessful}
-        <div class="mb-6">
-          <p class="mb-4">Congratulations on completing your 5/3/1 workout cycle! You've successfully met or exceeded all the minimum rep requirements for your AMRAP sets.</p>
-          <p class="mb-4">Based on your performance, we recommend increasing your training maxes:</p>
-          <ul class="list-disc pl-6 mb-4 space-y-1">
-            <li>Squat: +10 lbs (new 1RM: {oneRepMaxes.squat + 10} lbs)</li>
-            <li>Bench Press: +5 lbs (new 1RM: {oneRepMaxes.bench + 5} lbs)</li>
-            <li>Deadlift: +10 lbs (new 1RM: {oneRepMaxes.deadlift + 10} lbs)</li>
-            <li>Overhead Press: +5 lbs (new 1RM: {oneRepMaxes.press + 5} lbs)</li>
-          </ul>
-          <p>Would you like to generate a new workout plan with these increased values?</p>
-        </div>
+      <div class="mb-6">
+        <p class="mb-4">Congratulations on completing your 5/3/1 workout cycle!</p>
+        <p class="mb-4">Based on your AMRAP performance, here are the recommended changes to your training maxes:</p>
+        <ul class="list-none pl-2 mb-4 space-y-3">
+          <li class={liftSuccess.squat ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}>
+            <div class="flex items-center">
+              <span class={`inline-block w-5 h-5 rounded-full mr-2 ${liftSuccess.squat ? "bg-green-600 dark:bg-green-400" : "bg-red-600 dark:bg-red-400"} flex items-center justify-center text-white`}>✓</span>
+              <span class="font-medium">Squat:</span>
+              {#if liftSuccess.squat}
+                <span class="ml-2">+10 lbs (new 1RM: {oneRepMaxes.squat + 10} lbs)</span>
+              {:else}
+                <span class="ml-2">No increase (not all AMRAP sets met minimum requirements)</span>
+              {/if}
+            </div>
+          </li>
+          <li class={liftSuccess.bench ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}>
+            <div class="flex items-center">
+              <span class={`inline-block w-5 h-5 rounded-full mr-2 ${liftSuccess.bench ? "bg-green-600 dark:bg-green-400" : "bg-red-600 dark:bg-red-400"} flex items-center justify-center text-white`}>✓</span>
+              <span class="font-medium">Bench Press:</span>
+              {#if liftSuccess.bench}
+                <span class="ml-2">+5 lbs (new 1RM: {oneRepMaxes.bench + 5} lbs)</span>
+              {:else}
+                <span class="ml-2">No increase (not all AMRAP sets met minimum requirements)</span>
+              {/if}
+            </div>
+          </li>
+          <li class={liftSuccess.deadlift ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}>
+            <div class="flex items-center">
+              <span class={`inline-block w-5 h-5 rounded-full mr-2 ${liftSuccess.deadlift ? "bg-green-600 dark:bg-green-400" : "bg-red-600 dark:bg-red-400"} flex items-center justify-center text-white`}>✓</span>
+              <span class="font-medium">Deadlift:</span>
+              {#if liftSuccess.deadlift}
+                <span class="ml-2">+10 lbs (new 1RM: {oneRepMaxes.deadlift + 10} lbs)</span>
+              {:else}
+                <span class="ml-2">No increase (not all AMRAP sets met minimum requirements)</span>
+              {/if}
+            </div>
+          </li>
+          <li class={liftSuccess.press ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}>
+            <div class="flex items-center">
+              <span class={`inline-block w-5 h-5 rounded-full mr-2 ${liftSuccess.press ? "bg-green-600 dark:bg-green-400" : "bg-red-600 dark:bg-red-400"} flex items-center justify-center text-white`}>✓</span>
+              <span class="font-medium">Overhead Press:</span>
+              {#if liftSuccess.press}
+                <span class="ml-2">+5 lbs (new 1RM: {oneRepMaxes.press + 5} lbs)</span>
+              {:else}
+                <span class="ml-2">No increase (not all AMRAP sets met minimum requirements)</span>
+              {/if}
+            </div>
+          </li>
+        </ul>
         
-        <div class="flex justify-end gap-4">
-          <button 
-            type="button" 
-            class="px-4 py-2 bg-muted text-muted-foreground rounded-md hover:bg-muted/80"
-            on:click={closeCycleCompletionDialog}
-          >
-            Not Now
-          </button>
-          <button 
-            type="button" 
-            class="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
-            on:click={generateNewWorkoutPlan}
-          >
-            Generate New Plan
-          </button>
-        </div>
-      {:else}
-        <div class="mb-6">
-          <p class="mb-4">Congratulations on completing your 5/3/1 workout cycle!</p>
-          <p class="mb-4">We noticed that you didn't meet the minimum rep requirements on some of your AMRAP sets:</p>
-          
-          <div class="bg-muted/30 p-4 rounded-md mb-4">
-            <ul class="space-y-2">
-              {#each failedWorkouts as failure}
-                <li>
-                  <span class="font-medium">Week {failure.week}, Day {failure.day} - {failure.lift}:</span> 
-                  Got {failure.actual} reps (minimum: {failure.expected}+)
-                </li>
-              {/each}
-            </ul>
-          </div>
-          
-          <p>For steady and safe progress, we recommend repeating this cycle with the same weights before increasing your training maxes.</p>
-        </div>
-        
-        <div class="flex justify-end gap-4">
-          <button 
-            type="button" 
-            class="px-4 py-2 bg-muted text-muted-foreground rounded-md hover:bg-muted/80"
-            on:click={closeCycleCompletionDialog}
-          >
-            Not Now
-          </button>
-          <button 
-            type="button" 
-            class="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
-            on:click={regenerateWorkoutPlan}
-          >
-            Repeat Cycle
-          </button>
-        </div>
-      {/if}
+        {#if Object.values(liftSuccess).some(success => success)}
+          <p>Would you like to generate a new workout plan with these updated values?</p>
+        {:else}
+          <p>Since none of your lifts met the minimum requirements, we recommend repeating this cycle with the same weights.</p>
+        {/if}
+      </div>
+      
+      <div class="flex justify-end gap-4">
+        <button 
+          type="button" 
+          class="px-4 py-2 bg-muted text-muted-foreground rounded-md hover:bg-muted/80"
+          on:click={closeCycleCompletionDialog}
+        >
+          Not Now
+        </button>
+        <button 
+          type="button" 
+          class="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
+          on:click={generateNewWorkoutPlan}
+        >
+          Generate New Plan
+        </button>
+      </div>
     </div>
   </div>
 {/if}
