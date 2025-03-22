@@ -11,6 +11,9 @@
     weeks: data.weeks
   };
   
+  // Store the current plan ID
+  let currentPlanId = data.planId;
+  
   // Calculate 1RM values from training maxes (TM is 90% of 1RM)
   const oneRepMaxes = {
     squat: Math.round(workoutPlan.trainingMaxes.squat / 0.9),
@@ -22,6 +25,16 @@
   // Use a plain object for tracking completed sets
   let completedSets: Record<string, boolean> = {};
   
+  // Track AMRAP reps
+  let amrapReps: Record<string, number> = {};
+  
+  // Show/hide AMRAP dialog
+  let showAmrapDialog = false;
+  let amrapRepsInput = 0;
+  
+  // Track workout completion status
+  let workoutCompleted: Record<string, boolean> = {};
+  
   // Import onMount for initialization
   import { onMount } from 'svelte';
   
@@ -30,6 +43,17 @@
     data.progress.forEach((item: any) => {
       const key = `${item.week}-${item.day}-${item.mainLift}-${item.setIndex}`;
       completedSets[key] = item.completed;
+      
+      // Initialize AMRAP reps if available
+      if (item.amrapReps !== undefined) {
+        amrapReps[`${item.week}-${item.day}-${item.mainLift}`] = item.amrapReps;
+      }
+      
+      // Initialize workout completion status
+      if (item.workoutCompleted) {
+        const workoutKey = `${item.week}-${item.day}`;
+        workoutCompleted[workoutKey] = true;
+      }
     });
   }
   
@@ -37,6 +61,18 @@
   function isSetCompleted(week: number, day: number, liftName: string, setIndex: number): boolean {
     const key = `${week}-${day}-${liftName}-${setIndex}`;
     return completedSets[key] === true;
+  }
+  
+  // Function to check if workout is completed
+  function isWorkoutCompleted(week: number, day: number): boolean {
+    const key = `${week}-${day}`;
+    return workoutCompleted[key] === true;
+  }
+  
+  // Function to get AMRAP reps for a workout
+  function getAmrapReps(week: number, day: number, mainLift: string): number | null {
+    const key = `${week}-${day}-${mainLift}`;
+    return amrapReps[key] !== undefined ? amrapReps[key] : null;
   }
   
   // Function to format lift names for display
@@ -65,6 +101,82 @@
     completedSetsArray = Object.entries(completedSets).map(([key, completed]) => ({ key, completed }));
   }
   
+  // Function to check if all main lift sets are completed
+  function areAllMainLiftsCompleted(): boolean {
+    if (!currentWorkout) return false;
+    
+    // If the workout is already marked as completed, return true
+    if (isWorkoutCompleted(currentWeek, currentDay)) {
+      return true;
+    }
+    
+    // Check if all sets are completed
+    for (let i = 0; i < currentWorkout.mainLift.sets.length; i++) {
+      const key = `${currentWeek}-${currentDay}-${currentWorkout.mainLift.name}-${i}`;
+      if (!completedSets[key]) {
+        return false;
+      }
+    }
+    
+    return true;
+  }
+  
+  // Function to get the AMRAP set index (usually the last set)
+  function getAmrapSetIndex(): number {
+    if (!currentWorkout) return -1;
+    return currentWorkout.mainLift.sets.length - 1;
+  }
+  
+  // Function to show AMRAP dialog
+  function showAmrapRepDialog() {
+    if (!currentWorkout) return;
+    
+    // Initialize with existing value if available
+    const amrapKey = `${currentWeek}-${currentDay}-${currentWorkout.mainLift.name}`;
+    amrapRepsInput = amrapReps[amrapKey] || 0;
+    showAmrapDialog = true;
+  }
+  
+  // Function to save AMRAP reps
+  async function saveAmrapReps() {
+    if (!currentWorkout || amrapRepsInput < 0) return;
+    
+    const amrapKey = `${currentWeek}-${currentDay}-${currentWorkout.mainLift.name}`;
+    const workoutKey = `${currentWeek}-${currentDay}`;
+    
+    try {
+      const response = await fetch('/api/workouts/track-progress', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          week: currentWeek,
+          day: currentDay,
+          mainLift: currentWorkout.mainLift.name,
+          setIndex: getAmrapSetIndex(),
+          completed: true,
+          amrapReps: amrapRepsInput,
+          workoutCompleted: true,
+          planId: currentPlanId
+        })
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        // Update local state
+        amrapReps = { ...amrapReps, [amrapKey]: amrapRepsInput };
+        workoutCompleted = { ...workoutCompleted, [workoutKey]: true };
+        showAmrapDialog = false;
+      } else {
+        console.error('Failed to save AMRAP reps');
+      }
+    } catch (error) {
+      console.error('Error saving AMRAP reps:', error);
+    }
+  }
+  
   // Function to toggle set completion status
   async function toggleSetCompletion(setIndex: number) {
     if (!currentWorkout) return;
@@ -88,7 +200,8 @@
           day: currentDay,
           mainLift: currentWorkout.mainLift.name,
           setIndex,
-          completed: !isCompleted
+          completed: !isCompleted,
+          planId: currentPlanId
         })
       });
       
@@ -248,6 +361,7 @@
                           ? 'bg-green-600 text-white hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600' 
                           : 'border border-input bg-background hover:bg-muted/80 hover:text-accent-foreground'}"
                         on:click={() => toggleSetCompletion(i)}
+                        disabled={isWorkoutCompleted(currentWeek, currentDay)}
                       >
                         {#if isSetCompleted(currentWeek, currentDay, currentWorkout.mainLift.name, i)}
                           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1">
@@ -267,6 +381,34 @@
           <p class="mt-2 text-sm text-muted-foreground">
             The "+" indicates that the last set is an AMRAP (As Many Reps As Possible) set. Use the buttons to toggle completion status for each set.
           </p>
+          
+          {#if areAllMainLiftsCompleted() && !isWorkoutCompleted(currentWeek, currentDay)}
+            <div class="mt-6 flex justify-center">
+              <button
+                type="button"
+                class="px-6 py-3 bg-green-600 text-white rounded-md font-medium hover:bg-green-700 transition-colors shadow-md flex items-center justify-center gap-2"
+                on:click={showAmrapRepDialog}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                </svg>
+                Workout Complete
+              </button>
+            </div>
+          {/if}
+          
+          {#if isWorkoutCompleted(currentWeek, currentDay)}
+            <div class="mt-6 bg-green-100 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-md p-4 text-center">
+              {#if getAmrapReps(currentWeek, currentDay, currentWorkout.mainLift.name) !== null}
+                <p class="flex items-center justify-center gap-2 text-black dark:text-green-300 font-bold">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                  </svg>
+                  <span>You completed <span class="font-bold">{getAmrapReps(currentWeek, currentDay, currentWorkout.mainLift.name)}</span> reps on your AMRAP set</span>
+                </p>
+              {/if}
+            </div>
+          {/if}
         </div>
         
         <div class="mb-8">
@@ -377,3 +519,41 @@
     </button>
   </div>
 </div>
+
+{#if showAmrapDialog}
+  <div class="fixed inset-0 bg-black/50 dark:bg-black/80 backdrop-blur-sm flex items-center justify-center z-50">
+    <div class="bg-white dark:bg-card text-black dark:text-card-foreground p-6 rounded-lg shadow-xl max-w-md w-full border-2 border-primary/20">
+      <h3 class="text-xl font-bold mb-4 text-primary">Record AMRAP Set</h3>
+      <p class="mb-6 font-medium">How many reps did you complete on your AMRAP set for {currentWorkout?.mainLift ? formatLiftName(currentWorkout.mainLift.name) : ''}?</p>
+      
+      <div class="mb-6">
+        <label for="amrap-reps" class="block text-sm font-medium mb-2">Number of Reps</label>
+        <input 
+          type="number" 
+          id="amrap-reps" 
+          bind:value={amrapRepsInput}
+          min="0"
+          class="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+          placeholder="Enter number of reps"
+        />
+      </div>
+      
+      <div class="flex justify-end gap-4">
+        <button 
+          type="button" 
+          class="px-4 py-2 bg-muted text-muted-foreground rounded-md hover:bg-muted/80"
+          on:click={() => showAmrapDialog = false}
+        >
+          Cancel
+        </button>
+        <button 
+          type="button" 
+          class="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
+          on:click={saveAmrapReps}
+        >
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
+{/if}

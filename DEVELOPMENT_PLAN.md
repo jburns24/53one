@@ -105,6 +105,7 @@
 
 ## Progress Tracking - In Progress ✅
 - [x] Implement progress tracking
+- [x] Add workout completion feature with AMRAP tracking
 - [ ] Add visualization for workout history
 - [ ] Create settings page for user preferences
 
@@ -129,4 +130,8 @@
 - [ ] Add support for different workout methodologies
 
 ## Current Status
-The application now has a fully functional workout planning system based on the 5/3/1 methodology. Users can authenticate with Google OAuth, enter their 1RM values, and generate personalized workout plans. The application saves user data to MongoDB and displays the generated workout plans with proper sets, reps, and weights. Dark mode has been implemented for better user experience. The next steps include implementing progress tracking and workout history visualization.
+The application now has a fully functional workout planning system based on the 5/3/1 methodology. Users can authenticate with Google OAuth, enter their 1RM values, and generate personalized workout plans. The application saves user data to MongoDB and displays the generated workout plans with proper sets, reps, and weights. 
+
+Progress tracking has been implemented, allowing users to mark sets as completed. When all main lift sets are completed, a "Workout Complete" button appears, prompting users to enter the number of reps they performed on their AMRAP set. Once a workout is completed, the interface locks to prevent further changes and displays the recorded AMRAP reps.
+
+Dark mode has been implemented for better user experience. The next steps include implementing workout history visualization and creating a settings page for user preferences.

@@ -52,22 +52,28 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       { upsert: true }
     );
     
-    // Save the generated workout plan
+    // Generate a unique plan ID (timestamp + random string)
+    const planId = `${Date.now()}-${Math.random().toString(36).substring(2, 10)}`;
+    
+    // Save the generated workout plan with the unique plan ID
     await db.collection('workoutPlans').updateOne(
       { userId: session.user.id },
       { 
         $set: { 
           plan: workoutPlan,
+          planId: planId,
           createdAt: new Date()
         }
       },
       { upsert: true }
     );
     
-    return json({ 
-      success: true, 
-      trainingMaxes,
-      workoutPlan
+    // Redirect to the 1RM page with updated values
+    return new Response(null, {
+      status: 303,
+      headers: {
+        Location: '/dashboard/1rm?success=true'
+      }
     });
   } catch (error) {
     console.error('Error generating workout plan:', error);

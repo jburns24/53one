@@ -19,9 +19,12 @@ export const load: PageServerLoad = async ({ locals }) => {
     const userMaxes = await db.collection('userMaxes').findOne({ userId: session.user.id });
     const workoutPlan = await db.collection('workoutPlans').findOne({ userId: session.user.id });
     
-    // Fetch workout progress data
+    // Get the current plan ID
+    const planId = workoutPlan?.planId || 'default';
+    
+    // Fetch workout progress data for the current plan
     const progressData = await db.collection('workoutProgress')
-      .find({ userId: session.user.id })
+      .find({ userId: session.user.id, planId: planId })
       .toArray();
       
     // Convert MongoDB documents to plain JavaScript objects to avoid serialization issues
@@ -32,6 +35,8 @@ export const load: PageServerLoad = async ({ locals }) => {
       mainLift: item.mainLift,
       setIndex: item.setIndex,
       completed: item.completed,
+      amrapReps: item.amrapReps,
+      workoutCompleted: item.workoutCompleted,
       updatedAt: item.updatedAt ? item.updatedAt.toISOString() : null
     }));
     
@@ -44,7 +49,8 @@ export const load: PageServerLoad = async ({ locals }) => {
     return {
       trainingMaxes: userMaxes.trainingMaxes,
       weeks: workoutPlan.plan,
-      progress: serializedProgressData
+      progress: serializedProgressData,
+      planId: planId
     };
   } catch (error) {
     console.error('Error fetching workout data:', error);

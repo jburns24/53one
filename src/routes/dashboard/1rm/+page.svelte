@@ -34,6 +34,21 @@
       };
       hasExistingMaxes = true;
     }
+    
+    // Check for success parameter in URL
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('success') === 'true') {
+      success = "Workout plan updated successfully! You can now view your new workout plan.";
+      
+      // Clear the URL parameter without refreshing the page
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, document.title, newUrl);
+      
+      // Automatically redirect to workouts page after a delay
+      setTimeout(() => {
+        window.location.href = "/dashboard/workouts";
+      }, 2000);
+    }
   });
 
   function validateForm() {
@@ -160,20 +175,10 @@
 
       submitting = true;
 
-      return async ({ result, update }) => {
-        submitting = false;
+      // The server will handle the redirect
+      // No need to return a callback function
+      return;
 
-        if (result.type === "success") {
-          success = "Workout plan generated successfully!";
-          setTimeout(() => {
-            window.location.href = "/dashboard/workouts";
-          }, 1500);
-        } else if (result.type === "error") {
-          error = result.error?.message || "Failed to generate workout plan";
-        }
-
-        await update();
-      };
     }}
     class="space-y-6"
   >
