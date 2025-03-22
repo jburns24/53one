@@ -2,6 +2,7 @@
   import { page } from '$app/stores';
   import type { PageData } from './$types';
   import { derived, writable } from 'svelte/store';
+  import { Confetti } from 'svelte-confetti';
   
   export let data: PageData;
   
@@ -32,6 +33,9 @@
   // Show/hide AMRAP dialog
   let showAmrapDialog = false;
   let amrapRepsInput = 0;
+  
+  // State for controlling confetti animation
+  let showConfetti = false;
   
   // Show/hide cycle completion dialog
   let showCycleCompletionDialog = false;
@@ -258,6 +262,12 @@
         // Update local state
         workoutCompleted = { ...workoutCompleted, [workoutKey]: true };
         
+        // Trigger confetti celebration
+        showConfetti = true;
+        setTimeout(() => {
+          showConfetti = false;
+        }, 2000);
+        
         // Check if all workouts are completed after marking this one
         if (areAllWorkoutsCompleted()) {
           // Determine if all AMRAP sets met minimum requirements
@@ -311,6 +321,12 @@
         amrapReps = { ...amrapReps, [amrapKey]: amrapRepsInput };
         workoutCompleted = { ...workoutCompleted, [workoutKey]: true };
         showAmrapDialog = false;
+        
+        // Trigger confetti celebration
+        showConfetti = true;
+        setTimeout(() => {
+          showConfetti = false;
+        }, 2000);
         
         // Check if all workouts are completed after marking this one
         if (areAllWorkoutsCompleted()) {
@@ -418,6 +434,16 @@
 </script>
 
 <div class="max-w-4xl mx-auto">
+  {#if showConfetti}
+    <Confetti
+      x={[-5, 5]}
+      y={[0, 0.1]}
+      delay={[0, 500]}
+      duration={2000}
+      amount={100}
+      fallDistance="100vh"
+    />
+  {/if}
   <div class="mb-8">
     <h1 class="text-3xl font-bold mb-2">Your 5/3/1 Workout Plan</h1>
     <p class="text-muted-foreground">

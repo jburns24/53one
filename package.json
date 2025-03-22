@@ -30,6 +30,7 @@
 		"@auth/sveltekit": "^1.8.0",
 		"clsx": "^2.1.1",
 		"mongodb": "^6.14.2",
+		"svelte-confetti": "^2.3.1",
 		"tailwind-merge": "^3.0.2"
 	}
 }
