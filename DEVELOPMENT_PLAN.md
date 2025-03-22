@@ -122,6 +122,35 @@
 - [ ] Deploy to hosting platform
 - [ ] Set up monitoring and error tracking
 
+## User Settings - To Do
+- [ ] Create settings page with user preference sections
+- [ ] Implement settings storage in MongoDB
+
+### Workout Preferences
+- [ ] Weight Units: Toggle between pounds (lbs) and kilograms (kg)
+- [ ] Rounding Preferences: Configure how weights should be rounded (to nearest 5 lbs, 2.5 lbs, etc.)
+- [ ] Training Max Percentage: Allow customization of percentage used for training max (default 90%)
+- [ ] Accessory Work Templates: Add selection for preferred templates (BBB, FSL, etc.)
+- [ ] Rest Timer Duration: Add customizable rest periods between sets
+
+### Program Customization
+- [ ] Cycle Length: Option to modify the standard 3+1 week pattern
+- [ ] Progression Rate: Customize weight increases after each cycle
+- [ ] Deload Strategy: Configure different deload approaches
+- [ ] Exercise Substitutions: Allow alternative lifts for main movements
+
+### UI Preferences
+- [ ] Dark/Light Mode Toggle: Improve the existing theme switching
+- [ ] Dashboard Layout: Allow customization of dashboard widgets
+- [ ] Notification Settings: Configure workout reminders
+- [ ] Data Visualization: Set preferences for progress charts
+
+### Account Settings
+- [ ] Profile Information: Update name, email, profile picture
+- [ ] Password Management: Change password, enable 2FA
+- [ ] Data Export: Add option to export workout history and PRs
+- [ ] Account Deletion: Process to delete account and data
+
 ## Future Enhancements - To Do
 - [ ] Implement social sharing features
 - [ ] Add export functionality for workout plans
