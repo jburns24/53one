@@ -229,6 +229,56 @@
     showAmrapDialog = true;
   }
   
+  // Function to mark workout complete without AMRAP input (for deload week)
+  async function markWorkoutComplete() {
+    if (!currentWorkout) return;
+    
+    const workoutKey = `${currentWeek}-${currentDay}`;
+    
+    try {
+      const response = await fetch('/api/workouts/track-progress', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          week: currentWeek,
+          day: currentDay,
+          mainLift: currentWorkout.mainLift.name,
+          setIndex: getAmrapSetIndex(),
+          completed: true,
+          workoutCompleted: true,
+          planId: currentPlanId
+        })
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        // Update local state
+        workoutCompleted = { ...workoutCompleted, [workoutKey]: true };
+        
+        // Check if all workouts are completed after marking this one
+        if (areAllWorkoutsCompleted()) {
+          // Determine if all AMRAP sets met minimum requirements
+          cycleSuccessful = didMeetAllAmrapMinimums();
+          
+          if (!cycleSuccessful) {
+            // Get the list of failed workouts
+            failedWorkouts = getFailedAmrapWorkouts();
+          }
+          
+          // Show the cycle completion dialog
+          showCycleCompletionDialog = true;
+        }
+      } else {
+        console.error('Failed to mark workout complete');
+      }
+    } catch (error) {
+      console.error('Error marking workout complete:', error);
+    }
+  }
+  
   // Function to save AMRAP reps
   async function saveAmrapReps() {
     if (!currentWorkout || amrapRepsInput < 0) return;
@@ -491,7 +541,7 @@
                     <td class="px-4 py-3 font-bold">{set.weight}</td>
                     <td class="px-4 py-3">
                       <span class="flex items-center gap-2">
-                        {set.reps}{i === currentWorkout.mainLift.sets.length - 1 ? '+' : ''}
+                        {set.reps}{i === currentWorkout.mainLift.sets.length - 1 && currentWeek !== 4 ? '+' : ''}
                       </span>
                     </td>
                     <td class="px-4 py-3 text-muted-foreground">{(set.percentage * 100).toFixed(0)}%</td>
@@ -522,7 +572,11 @@
             </table>
           </div>
           <p class="mt-2 text-sm text-muted-foreground">
-            The "+" indicates that the last set is an AMRAP (As Many Reps As Possible) set. Use the buttons to toggle completion status for each set.
+            {#if currentWeek !== 4}
+              The "+" indicates that the last set is an AMRAP (As Many Reps As Possible) set. Use the buttons to toggle completion status for each set.
+            {:else}
+              Deload week (Week 4) does not include AMRAP sets. Simply complete all prescribed sets and reps.
+            {/if}
           </p>
           
           {#if areAllMainLiftsCompleted() && !isWorkoutCompleted(currentWeek, currentDay)}
@@ -530,7 +584,7 @@
               <button
                 type="button"
                 class="px-6 py-3 bg-green-600 text-white rounded-md font-medium hover:bg-green-700 transition-colors shadow-md flex items-center justify-center gap-2"
-                on:click={showAmrapRepDialog}
+                on:click={currentWeek === 4 ? markWorkoutComplete : showAmrapRepDialog}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                   <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
@@ -542,7 +596,14 @@
           
           {#if isWorkoutCompleted(currentWeek, currentDay)}
             <div class="mt-6 bg-green-100 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-md p-4 text-center">
-              {#if getAmrapReps(currentWeek, currentDay, currentWorkout.mainLift.name) !== null}
+              {#if currentWeek === 4}
+                <p class="flex items-center justify-center gap-2 text-black dark:text-green-300 font-bold">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                  </svg>
+                  <span>Workout Complete</span>
+                </p>
+              {:else if getAmrapReps(currentWeek, currentDay, currentWorkout.mainLift.name) !== null}
                 <p class="flex items-center justify-center gap-2 text-black dark:text-green-300 font-bold">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
