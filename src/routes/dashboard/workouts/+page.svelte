@@ -15,11 +15,12 @@
   let currentPlanId = data.planId;
   
   // Calculate 1RM values from training maxes (TM is 90% of 1RM)
+  // Using Math.floor to ensure we don't round up and cause the +1 issue
   const oneRepMaxes = {
-    squat: Math.round(workoutPlan.trainingMaxes.squat / 0.9),
-    bench: Math.round(workoutPlan.trainingMaxes.bench / 0.9),
-    deadlift: Math.round(workoutPlan.trainingMaxes.deadlift / 0.9),
-    press: Math.round(workoutPlan.trainingMaxes.press / 0.9)
+    squat: Math.floor(workoutPlan.trainingMaxes.squat / 0.9),
+    bench: Math.floor(workoutPlan.trainingMaxes.bench / 0.9),
+    deadlift: Math.floor(workoutPlan.trainingMaxes.deadlift / 0.9),
+    press: Math.floor(workoutPlan.trainingMaxes.press / 0.9)
   };
   
   // Use a plain object for tracking completed sets
@@ -31,6 +32,11 @@
   // Show/hide AMRAP dialog
   let showAmrapDialog = false;
   let amrapRepsInput = 0;
+  
+  // Show/hide cycle completion dialog
+  let showCycleCompletionDialog = false;
+  let cycleSuccessful = false;
+  let failedWorkouts: Array<{week: number, day: number, lift: string, expected: number, actual: number}> = [];
   
   // Track workout completion status
   let workoutCompleted: Record<string, boolean> = {};
@@ -67,6 +73,92 @@
   function isWorkoutCompleted(week: number, day: number): boolean {
     const key = `${week}-${day}`;
     return workoutCompleted[key] === true;
+  }
+  
+  // Function to check if all workouts in the plan are completed
+  function areAllWorkoutsCompleted(): boolean {
+    // Check all 4 weeks and all 4 days per week
+    for (let week = 1; week <= 4; week++) {
+      for (let day = 1; day <= 4; day++) {
+        if (!isWorkoutCompleted(week, day)) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+  
+  // Function to check if all AMRAP sets met minimum requirements
+  function didMeetAllAmrapMinimums(): boolean {
+    // Week 1: 5+ sets, Week 2: 3+ sets, Week 3: 1+ sets
+    // Week 4 is deload, no AMRAP sets to check
+    const minimumReps: Record<number, number> = {
+      1: 5, // Week 1: 5+ sets
+      2: 3, // Week 2: 3+ sets
+      3: 1  // Week 3: 1+ sets
+    };
+    
+    // Check all main lifts for weeks 1-3
+    const mainLifts = ['squat', 'bench', 'deadlift', 'press'];
+    
+    for (let week = 1; week <= 3; week++) {
+      for (let day = 1; day <= 4; day++) {
+        // Get the workout for this week/day
+        const workout = workoutPlan.weeks?.[week - 1]?.workouts?.[day - 1];
+        if (!workout) continue;
+        
+        // Get the main lift name
+        const mainLift = workout.mainLift.name;
+        
+        // Get AMRAP reps for this workout
+        const reps = getAmrapReps(week, day, mainLift);
+        
+        // If no reps recorded or less than minimum, return false
+        if (reps === null || reps < minimumReps[week]) {
+          return false;
+        }
+      }
+    }
+    
+    return true;
+  }
+  
+  // Function to get failed AMRAP workouts
+  function getFailedAmrapWorkouts(): Array<{week: number, day: number, lift: string, expected: number, actual: number}> {
+    const failures: Array<{week: number, day: number, lift: string, expected: number, actual: number}> = [];
+    const minimumReps: Record<number, number> = {
+      1: 5, // Week 1: 5+ sets
+      2: 3, // Week 2: 3+ sets
+      3: 1  // Week 3: 1+ sets
+    };
+    
+    // Check all main lifts for weeks 1-3
+    for (let week = 1; week <= 3; week++) {
+      for (let day = 1; day <= 4; day++) {
+        // Get the workout for this week/day
+        const workout = workoutPlan.weeks?.[week - 1]?.workouts?.[day - 1];
+        if (!workout) continue;
+        
+        // Get the main lift name
+        const mainLift = workout.mainLift.name;
+        
+        // Get AMRAP reps for this workout
+        const reps = getAmrapReps(week, day, mainLift);
+        
+        // If no reps recorded or less than minimum, add to failures
+        if (reps !== null && reps < minimumReps[week]) {
+          failures.push({
+            week,
+            day,
+            lift: formatLiftName(mainLift),
+            expected: minimumReps[week],
+            actual: reps
+          });
+        }
+      }
+    }
+    
+    return failures;
   }
   
   // Function to get AMRAP reps for a workout
@@ -169,12 +261,63 @@
         amrapReps = { ...amrapReps, [amrapKey]: amrapRepsInput };
         workoutCompleted = { ...workoutCompleted, [workoutKey]: true };
         showAmrapDialog = false;
+        
+        // Check if all workouts are completed after marking this one
+        if (areAllWorkoutsCompleted()) {
+          // Determine if all AMRAP sets met minimum requirements
+          cycleSuccessful = didMeetAllAmrapMinimums();
+          
+          if (!cycleSuccessful) {
+            // Get the list of failed workouts
+            failedWorkouts = getFailedAmrapWorkouts();
+          }
+          
+          // Show the cycle completion dialog
+          showCycleCompletionDialog = true;
+        }
       } else {
         console.error('Failed to save AMRAP reps');
       }
     } catch (error) {
       console.error('Error saving AMRAP reps:', error);
     }
+  }
+  
+  // Function to generate a new workout plan with increased 1RM values
+  function generateNewWorkoutPlan() {
+    // Calculate new 1RM values (add 10lbs to squat and deadlift, 5lbs to bench and press)
+    const newOneRepMaxes = {
+      squat: oneRepMaxes.squat + 10,
+      bench: oneRepMaxes.bench + 5,
+      deadlift: oneRepMaxes.deadlift + 10,
+      press: oneRepMaxes.press + 5
+    };
+    
+    // Redirect to 1RM page with new values
+    const params = new URLSearchParams();
+    params.set('squat', newOneRepMaxes.squat.toString());
+    params.set('bench', newOneRepMaxes.bench.toString());
+    params.set('deadlift', newOneRepMaxes.deadlift.toString());
+    params.set('press', newOneRepMaxes.press.toString());
+    
+    window.location.href = `/dashboard/1rm?${params.toString()}`;
+  }
+  
+  // Function to regenerate workout plan with same 1RM values
+  function regenerateWorkoutPlan() {
+    // Redirect to 1RM page with current values
+    const params = new URLSearchParams();
+    params.set('squat', oneRepMaxes.squat.toString());
+    params.set('bench', oneRepMaxes.bench.toString());
+    params.set('deadlift', oneRepMaxes.deadlift.toString());
+    params.set('press', oneRepMaxes.press.toString());
+    
+    window.location.href = `/dashboard/1rm?${params.toString()}`;
+  }
+  
+  // Function to close the cycle completion dialog
+  function closeCycleCompletionDialog() {
+    showCycleCompletionDialog = false;
   }
   
   // Function to toggle set completion status
@@ -554,6 +697,80 @@
           Save
         </button>
       </div>
+    </div>
+  </div>
+{/if}
+
+{#if showCycleCompletionDialog}
+  <div class="fixed inset-0 bg-black/50 dark:bg-black/80 backdrop-blur-sm flex items-center justify-center z-50">
+    <div class="bg-white dark:bg-card text-black dark:text-card-foreground p-6 rounded-lg shadow-xl max-w-lg w-full border-2 border-primary/20">
+      <h3 class="text-xl font-bold mb-4 text-primary">Workout Cycle Completed!</h3>
+      
+      {#if cycleSuccessful}
+        <div class="mb-6">
+          <p class="mb-4">Congratulations on completing your 5/3/1 workout cycle! You've successfully met or exceeded all the minimum rep requirements for your AMRAP sets.</p>
+          <p class="mb-4">Based on your performance, we recommend increasing your training maxes:</p>
+          <ul class="list-disc pl-6 mb-4 space-y-1">
+            <li>Squat: +10 lbs (new 1RM: {oneRepMaxes.squat + 10} lbs)</li>
+            <li>Bench Press: +5 lbs (new 1RM: {oneRepMaxes.bench + 5} lbs)</li>
+            <li>Deadlift: +10 lbs (new 1RM: {oneRepMaxes.deadlift + 10} lbs)</li>
+            <li>Overhead Press: +5 lbs (new 1RM: {oneRepMaxes.press + 5} lbs)</li>
+          </ul>
+          <p>Would you like to generate a new workout plan with these increased values?</p>
+        </div>
+        
+        <div class="flex justify-end gap-4">
+          <button 
+            type="button" 
+            class="px-4 py-2 bg-muted text-muted-foreground rounded-md hover:bg-muted/80"
+            on:click={closeCycleCompletionDialog}
+          >
+            Not Now
+          </button>
+          <button 
+            type="button" 
+            class="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
+            on:click={generateNewWorkoutPlan}
+          >
+            Generate New Plan
+          </button>
+        </div>
+      {:else}
+        <div class="mb-6">
+          <p class="mb-4">Congratulations on completing your 5/3/1 workout cycle!</p>
+          <p class="mb-4">We noticed that you didn't meet the minimum rep requirements on some of your AMRAP sets:</p>
+          
+          <div class="bg-muted/30 p-4 rounded-md mb-4">
+            <ul class="space-y-2">
+              {#each failedWorkouts as failure}
+                <li>
+                  <span class="font-medium">Week {failure.week}, Day {failure.day} - {failure.lift}:</span> 
+                  Got {failure.actual} reps (minimum: {failure.expected}+)
+                </li>
+              {/each}
+            </ul>
+          </div>
+          
+          <p>For steady and safe progress, we recommend repeating this cycle with the same weights before increasing your training maxes.</p>
+        </div>
+        
+        <div class="flex justify-end gap-4">
+          <button 
+            type="button" 
+            class="px-4 py-2 bg-muted text-muted-foreground rounded-md hover:bg-muted/80"
+            on:click={closeCycleCompletionDialog}
+          >
+            Not Now
+          </button>
+          <button 
+            type="button" 
+            class="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
+            on:click={regenerateWorkoutPlan}
+          >
+            Repeat Cycle
+          </button>
+        </div>
+      {/if}
     </div>
   </div>
 {/if}

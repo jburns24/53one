@@ -24,8 +24,28 @@
   onMount(() => {
     console.log("1RM Client - User Maxes:", data.userMaxes);
 
-    // Update values from data
-    if (data.userMaxes) {
+    // Check for query parameters first
+    const urlParams = new URLSearchParams(window.location.search);
+    const querySquat = urlParams.get('squat');
+    const queryBench = urlParams.get('bench');
+    const queryDeadlift = urlParams.get('deadlift');
+    const queryPress = urlParams.get('press');
+    
+    // If query parameters exist, use them
+    if (querySquat || queryBench || queryDeadlift || queryPress) {
+      maxes = {
+        squat: querySquat ? parseInt(querySquat, 10) : (data.userMaxes?.squat || 0),
+        bench: queryBench ? parseInt(queryBench, 10) : (data.userMaxes?.bench || 0),
+        deadlift: queryDeadlift ? parseInt(queryDeadlift, 10) : (data.userMaxes?.deadlift || 0),
+        press: queryPress ? parseInt(queryPress, 10) : (data.userMaxes?.press || 0),
+      };
+      hasExistingMaxes = true;
+      
+      // Clear the URL parameters without refreshing the page
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+    // Otherwise, use data from server if available
+    else if (data.userMaxes) {
       maxes = {
         squat: data.userMaxes.squat || 0,
         bench: data.userMaxes.bench || 0,
@@ -36,7 +56,6 @@
     }
     
     // Check for success parameter in URL
-    const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('success') === 'true') {
       success = "Workout plan updated successfully! You can now view your new workout plan.";
       
