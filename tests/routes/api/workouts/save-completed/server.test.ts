@@ -1,9 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { POST } from './+server';
-import { json } from '@sveltejs/kit';
+import { POST } from '../../../../../src/routes/api/workouts/save-completed/+server';
 
 // Mock MongoDB client
-vi.mock('$lib/server/mongodb', () => {
+vi.mock('../../../../../src/lib/server/mongodb', () => {
   const mockInsertOne = vi.fn().mockResolvedValue({ acknowledged: true });
   const mockCollection = vi.fn().mockReturnValue({
     insertOne: mockInsertOne
@@ -61,7 +60,7 @@ describe('Save Completed Workout API', () => {
     expect(data).toEqual({ success: true });
     
     // Verify MongoDB interaction
-    const { clientPromise } = await import('$lib/server/mongodb');
+    const { clientPromise } = await import('../../../../../src/lib/server/mongodb');
     const client = await clientPromise;
     const mockCollection = client.db().collection;
     

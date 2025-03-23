@@ -11,8 +11,8 @@ export default defineConfig({
     }
   },
   test: {
-    include: ['src/**/*.{test,spec}.{js,ts}'],
-    exclude: ['src/**/*ThemeToggle.test.ts'], // Temporarily exclude Svelte component tests
+    include: ['tests/**/*.{test,spec}.{js,ts}'],
+    exclude: ['tests/**/*ThemeToggle.test.ts'], // Temporarily exclude Svelte component tests
     environment: 'jsdom',
     globals: true,
     setupFiles: ['./src/test-setup.ts'],

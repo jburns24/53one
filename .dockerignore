@@ -1,0 +1,48 @@
+# Version control
+.git
+.gitignore
+.github
+
+# Node.js dependencies
+node_modules
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Build artifacts
+build
+.svelte-kit
+.output
+
+# Development files
+.vscode
+.idea
+*.swp
+*.swo
+.DS_Store
+
+# Test files
+coverage
+__tests__
+*.test.ts
+*.spec.ts
+vitest.config.ts
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Documentation
+README.md
+DEVELOPMENT_PLAN.md
+LICENSE
+*.md
+
+# Docker related
+Dockerfile
+.dockerignore
+docker-compose.yml
+
+# Other
+.windsurfrules

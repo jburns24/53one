@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { POST } from './+server';
-import { generate531WorkoutPlan } from '$lib/utils/workout';
+import { POST } from '../../../../../src/routes/api/workouts/create-plan/+server';
+import { generate531WorkoutPlan } from '../../../../../src/lib/utils/workout';
 
 // Mock the workout generator
-vi.mock('$lib/utils/workout', () => ({
+vi.mock('../../../../../src/lib/utils/workout', () => ({
   generate531WorkoutPlan: vi.fn().mockReturnValue([
     { week: 1, workouts: [] },
     { week: 2, workouts: [] },
@@ -13,7 +13,7 @@ vi.mock('$lib/utils/workout', () => ({
 }));
 
 // Mock MongoDB client
-vi.mock('$lib/server/mongodb', () => {
+vi.mock('../../../../../src/lib/server/mongodb', () => {
   const mockUpdateOne = vi.fn().mockResolvedValue({ acknowledged: true });
   const mockCollection = vi.fn().mockReturnValue({
     updateOne: mockUpdateOne
@@ -79,7 +79,7 @@ describe('Create Workout Plan API', () => {
     });
     
     // Verify MongoDB interactions
-    const { clientPromise } = await import('$lib/server/mongodb');
+    const { clientPromise } = await import('../../../../../src/lib/server/mongodb');
     const client = await clientPromise;
     const mockCollection = client.db().collection;
     

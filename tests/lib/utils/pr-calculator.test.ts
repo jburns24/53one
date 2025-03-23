@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { calculatePRs, type CompletedWorkout } from './pr-calculator';
+import { calculatePRs, type CompletedWorkout } from '../../../src/lib/utils/pr-calculator';
 
 describe('PR Calculator', () => {
   it('should calculate PRs correctly from completed workouts', () => {

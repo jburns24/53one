@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: 53one-app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    env_file: ".env"
+    # environment:
+    #   - NODE_ENV=production
+    #   - MONGODB_URI=mongodb://mongodb:27017/53one?ssl=false 
+    #   - AUTH_SECRET=${AUTH_SECRET}
+    #   - AUTH_TRUST_HOST=true
+    #   - ORIGIN=http://localhost:3000
+    depends_on:
+      - mongodb
+    networks:
+      - 53one-network
+
+  mongodb:
+    image: mongo:6
+    container_name: 53one-mongodb
+    restart: unless-stopped
+    volumes:
+      - mongodb-data:/data/db
+    ports:
+      - "27017:27017"
+    networks:
+      - 53one-network
+
+networks:
+  53one-network:
+    driver: bridge
+
+volumes:
+  mongodb-data:
+    driver: local
