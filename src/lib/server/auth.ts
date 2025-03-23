@@ -3,11 +3,18 @@ import Google from '@auth/core/providers/google';
 import { MongoDBAdapter } from '@auth/mongodb-adapter';
 import type { Handle } from '@sveltejs/kit';
 import { env } from '$env/dynamic/private';
+import { sequence } from '@sveltejs/kit/hooks';
+import type { SvelteKitAuthConfig } from '@auth/sveltekit';
 
-// Only import MongoDB client in production mode
+// Import MongoDB client for both Docker and production environments
 let clientPromise;
-if (process.env.NODE_ENV !== 'development') {
-  // Dynamic import to avoid connection errors in development
+// Check if we're in Docker (will have MongoDB URI with mongodb:27017) or production
+const isDocker = env.MONGODB_URI?.includes('mongodb:27017');
+const isProduction = process.env.NODE_ENV === 'production';
+
+// Import MongoDB client if we're in Docker or production
+if (isDocker || isProduction) {
+  // Import MongoDB client
   const { clientPromise: mongoClient } = await import('./mongodb');
   clientPromise = mongoClient;
 }
@@ -17,13 +24,37 @@ const authConfig = {
   providers: [
     Google({
       clientId: env.GOOGLE_CLIENT_ID || '',
-      clientSecret: env.GOOGLE_CLIENT_SECRET || ''
+      clientSecret: env.GOOGLE_CLIENT_SECRET || '',
+      // Only add development-specific configuration when in development mode
+      ...(process.env.NODE_ENV === 'development' ? {
+        authorization: {
+          params: {
+            prompt: "consent",
+            access_type: "offline",
+            response_type: "code"
+          }
+        }
+      } : {})
     })
   ],
-  // Use MongoDB adapter only in production, use JWT in development for easier testing
-  ...(process.env.NODE_ENV !== 'development' && clientPromise ? { adapter: MongoDBAdapter(clientPromise) } : {}),
+  // Use MongoDB adapter in Docker or production, use JWT in local development for easier testing
+  ...(clientPromise ? { adapter: MongoDBAdapter(clientPromise) } : {}),
   // Add debug mode for development
   debug: process.env.NODE_ENV === 'development',
+  // Only disable secure cookies in development
+  ...(process.env.NODE_ENV === 'development' ? {
+    cookies: {
+      sessionToken: {
+        name: `next-auth.session-token`,
+        options: {
+          httpOnly: true,
+          sameSite: 'lax' as 'lax',
+          path: "/",
+          secure: false
+        }
+      }
+    }
+  } : {}),
   callbacks: {
     session: ({ session, user, token }: { session: any, user: any, token: any }) => {
       if (session.user) {
@@ -44,11 +75,18 @@ const authConfig = {
   secret: env.AUTH_SECRET || 'this_is_a_dev_secret_do_not_use_in_production',
   // Add CSRF protection configuration
   trustHost: true
+  // We'll handle custom routes ourselves rather than using the pages config
 };
 
-// Get the auth handler from SvelteKitAuth
-const auth = SvelteKitAuth(authConfig);
+// Create the SvelteKitAuth handler
+const authHandler = SvelteKitAuth(authConfig as SvelteKitAuthConfig);
+
+// Custom handle function to add any additional server-side logic
+const customHandle: Handle = async ({ event, resolve }) => {
+  // You can add custom server-side logic here if needed
+  return resolve(event);
+};
 
 // Export the handle function for hooks.server.ts
-export const handle = auth.handle as unknown as Handle;
-
+// Use sequence to combine multiple handlers if needed
+export const handle = sequence(authHandler.handle as Handle, customHandle);

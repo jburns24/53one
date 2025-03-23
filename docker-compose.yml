@@ -1,4 +1,4 @@
-version: '3.8'
+# Docker Compose configuration for 53one
 
 services:
   app:
@@ -10,12 +10,12 @@ services:
     ports:
       - "3000:3000"
     env_file: ".env"
-    # environment:
-    #   - NODE_ENV=production
-    #   - MONGODB_URI=mongodb://mongodb:27017/53one?ssl=false 
-    #   - AUTH_SECRET=${AUTH_SECRET}
-    #   - AUTH_TRUST_HOST=true
-    #   - ORIGIN=http://localhost:3000
+    environment:
+      - NODE_ENV=development
+      - AUTH_TRUST_HOST=true
+      - MONGODB_URI=mongodb://mongodb:27017/53one?ssl=false
+      - NEXTAUTH_URL=http://localhost:3000
+      - ORIGIN=http://localhost:3000
     depends_on:
       - mongodb
     networks:

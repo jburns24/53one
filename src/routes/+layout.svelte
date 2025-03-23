@@ -24,11 +24,11 @@
           <div class="flex items-center space-x-4">
             {#if $page.data.session?.user}
               <a href="/dashboard" class="px-3 py-2 hover:bg-primary-foreground/10 rounded-md">Dashboard</a>
-              <a href="/workout-data" class="px-3 py-2 hover:bg-primary-foreground/10 rounded-md">My Lifts</a>
-              <a href="/schedule" class="px-3 py-2 hover:bg-primary-foreground/10 rounded-md">My Schedule</a>
-              <a href="/auth/signout" class="px-3 py-2 hover:bg-primary-foreground/10 rounded-md">Sign Out</a>
+              <a href="/dashboard/1rm" class="px-3 py-2 hover:bg-primary-foreground/10 rounded-md">My 1RM</a>
+              <a href="/dashboard/workouts" class="px-3 py-2 hover:bg-primary-foreground/10 rounded-md">My Workouts</a>
+              <a href="/api/auth/signout" class="px-3 py-2 hover:bg-primary-foreground/10 rounded-md">Sign Out</a>
             {:else}
-              <a href="/auth/signin" class="px-3 py-2 hover:bg-primary-foreground/10 rounded-md">Sign In</a>
+              <a href="/api/auth/signin" class="px-3 py-2 hover:bg-primary-foreground/10 rounded-md">Sign In</a>
             {/if}
           </div>
         </div>

@@ -15,15 +15,33 @@ declare global {
 }
 
 // Configure MongoDB connection options to handle connection issues
+const isDevelopment = process.env.NODE_ENV === 'development';
+
+// Parse the MongoDB URI to check if SSL is explicitly set
+const uriHasSSLParam = env.MONGODB_URI.includes('ssl=');
+
+// Set options based on environment and URI parameters
 const options = {
   connectTimeoutMS: 30000, // Increase connection timeout
   socketTimeoutMS: 30000, // Increase socket timeout
   retryWrites: true,
   retryReads: true,
-  // Use the tls option for SSL/TLS configuration
-  tls: true,
-  tlsAllowInvalidCertificates: process.env.NODE_ENV === 'development'
 };
+
+// Only add SSL options if not already in the connection string
+if (!uriHasSSLParam) {
+  if (isDevelopment) {
+    // In development, disable SSL by default
+    Object.assign(options, {
+      tls: false
+    });
+  } else {
+    // In production, enable SSL with proper validation
+    Object.assign(options, {
+      tls: true
+    });
+  }
+}
 
 if (process.env.NODE_ENV === 'development') {
   // In development mode, use a global variable so that the value

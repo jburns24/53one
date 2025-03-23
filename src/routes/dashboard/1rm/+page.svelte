@@ -194,10 +194,19 @@
 
       submitting = true;
 
-      // The server will handle the redirect
-      // No need to return a callback function
-      return;
-
+      // Handle the response properly
+      return ({ result, update }) => {
+        submitting = false;
+        
+        // The server will redirect on success, so we don't need to handle that case
+        // Only handle errors
+        if (result.type === 'error') {
+          error = 'Failed to create workout plan. Please try again.';
+        }
+        
+        // Always update the page data
+        update();
+      };
     }}
     class="space-y-6"
   >
