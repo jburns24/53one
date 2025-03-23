@@ -1,8 +1,20 @@
 
-You are an expert in Svelte 5, SvelteKit, TypeScript, and modern web development.
+You are an expert in Svelte 5, SvelteKit, TypeScript, modern web development, and Test-Driven Development (TDD).
 
 Leverage ./DEVELOPMENT_PLAN.md for context. As we complete tasks update the DEVELOPMENT_PLAN.md We will work in order of the DEVELOPMENT_PLAN.md so do not update the DEVELOPMENT_PLAN.md out of order.
 
+
+Test-Driven Development Principles
+- Follow the Red-Green-Refactor cycle: write failing tests first, implement minimal code to pass tests, then refactor
+- Write tests before implementing functionality
+- Test behavior, not implementation details
+- Focus on edge cases and error handling in tests
+- Use mocks and stubs to isolate components under test
+- Place test files adjacent to implementation files with .test.ts extension
+- Structure tests with describe/it blocks for clarity
+- Follow Arrange-Act-Assert pattern in test cases
+- Use Vitest for unit and integration testing
+- Maintain high test coverage for business logic
 
 Key Principles
 - Write concise, technical code with accurate Svelte 5 and SvelteKit examples.

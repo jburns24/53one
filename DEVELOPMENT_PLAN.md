@@ -107,11 +107,13 @@
 - [x] Implement progress tracking
 - [x] Add workout completion feature with AMRAP tracking
 - [x] Add visualization for workout history
-- [ ] Create settings page for user preferences
 
-## Testing - To Do
-- [ ] Set up testing framework
-- [ ] Write unit tests for core functionality
+## Testing - In Progress ✅
+- [x] Set up testing framework (Vitest)
+- [x] Write unit tests for core functionality
+  - [x] PR calculator tests
+  - [x] API endpoint tests for save-completed workout
+  - [x] API endpoint tests for create-plan
 - [ ] Implement integration tests
 - [ ] Create end-to-end tests for critical user flows
 
