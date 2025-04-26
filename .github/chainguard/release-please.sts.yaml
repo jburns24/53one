@@ -1,5 +1,5 @@
 issuer: https://token.actions.githubusercontent.com
-subject_pattern: repo:jburns24/53one::ref:refs/heads/master
+subject_pattern: repo:jburns24/53one:ref:refs/heads/master
 claim_pattern:
   workflow_ref: jburns24/53one/.github/workflows/semantic-release.yaml@.* # Still not sure what needs to come after the actual workflow name but this works
 
