@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.3](https://github.com/jburns24/53one/compare/v1.1.2...v1.1.3) (2025-04-26)
+
+
+### Bug Fixes
+
+* updates bad ref to ghcr ([486d676](https://github.com/jburns24/53one/commit/486d676f77b8652e3390a1e4520ce6a4c7c57b90))
+
 ## [1.1.2](https://github.com/jburns24/53one/compare/v1.1.1...v1.1.2) (2025-04-26)
 
 
