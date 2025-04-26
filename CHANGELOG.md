@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.1.0](https://github.com/jburns24/53one/compare/v1.0.0...v1.1.0) (2025-04-26)
+
+
+### Features
+
+* add octo-sts to release please ([c199555](https://github.com/jburns24/53one/commit/c19955598798207143615db543d7e1b5df748bda))
+
+
+### Bug Fixes
+
+* adds missing id-token permission ([f9b3237](https://github.com/jburns24/53one/commit/f9b32374630af71d7d04dcb943fa4438e97c30aa))
+* remove unneeded permissions since switching to octo-sts ([c07e743](https://github.com/jburns24/53one/commit/c07e74330f975cc4bc50bbfe67b07643830d2d8f))
+* updated bad subject_pattern in trust policy ([8dd3f04](https://github.com/jburns24/53one/commit/8dd3f04f9052b1a5f535761f6b6a413e7caf2ae0))
+
 ## 1.0.0 (2025-04-26)
 
 
