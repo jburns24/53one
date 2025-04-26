@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/jburns24/53one/compare/v1.1.0...v1.1.1) (2025-04-26)
+
+
+### Bug Fixes
+
+* removed docker hub from docker metadata since I am only pushing to ghcr ([1fa6853](https://github.com/jburns24/53one/commit/1fa68532d3b76d84f989e78b074504229a6dbb0a))
+
 ## [1.1.0](https://github.com/jburns24/53one/compare/v1.0.0...v1.1.0) (2025-04-26)
 
 
