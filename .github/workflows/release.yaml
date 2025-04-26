@@ -1,9 +1,13 @@
-name: Release
+name: Docker Build and Push
 
 on:
   push:
     tags:
       - "v*.*.*"
+
+permissions:
+  packages: write
+  contents: read
 
 jobs:
   docker:
