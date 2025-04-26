@@ -114,8 +114,7 @@
   - [x] PR calculator tests
   - [x] API endpoint tests for save-completed workout
   - [x] API endpoint tests for create-plan
-- [ ] Implement integration tests
-- [ ] Create end-to-end tests for critical user flows
+
 
 ## Deployment - To Do
 - [ ] Configure production environment variables
