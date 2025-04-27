@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.4](https://github.com/jburns24/53one/compare/v1.1.3...v1.1.4) (2025-04-27)
+
+
+### Bug Fixes
+
+* update release workflow to create amd and arm builds ([e0618b6](https://github.com/jburns24/53one/commit/e0618b6155b0bfd88902169ce35c23adc99100d7))
+
 ## [1.1.3](https://github.com/jburns24/53one/compare/v1.1.2...v1.1.3) (2025-04-26)
 
 
