@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.0.0](https://github.com/jburns24/53one/compare/v1.1.4...v2.0.0) (2025-04-27)
+
+
+### ⚠ BREAKING CHANGES
+
+* This change modifies the GitHub Actions workflow to build arm64 images instead of armhf.
+
+### Features
+
+* Change to building arm images ([ab72953](https://github.com/jburns24/53one/commit/ab7295350cf1e7a6deca38a5f1884be28b08d47a))
+
 ## [1.1.4](https://github.com/jburns24/53one/compare/v1.1.3...v1.1.4) (2025-04-27)
 
 
