@@ -684,7 +684,11 @@
                         >Reps:
                       </span>
                       <span class="text-sm font-semibold"
-                        >{set.reps}{set.amrap ? "+" : ""}</span
+                        >{set.reps}{i ===
+                          currentWorkout.mainLift.sets.length - 1 &&
+                        currentWeek !== 4
+                          ? "+"
+                          : ""}</span
                       >
                     </td>
                     <td
