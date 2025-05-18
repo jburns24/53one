@@ -947,10 +947,10 @@
 
 {#if showAmrapDialog}
   <div
-    class="fixed inset-0 bg-black/50 dark:bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+    class="fixed inset-0 bg-black/50 dark:bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 py-2 px-1 sm:p-4"
   >
     <div
-      class="bg-white dark:bg-card text-black dark:text-card-foreground p-4 sm:p-6 rounded-lg shadow-xl w-full max-w-sm border border-border dark:border-border"
+      class="bg-white dark:bg-card text-black dark:text-card-foreground p-4 sm:p-6 rounded-lg shadow-xl w-full max-w-xs sm:max-w-sm border border-border dark:border-border"
     >
       <h2 class="text-lg sm:text-xl font-bold mb-4 text-center sm:text-left">
         Record AMRAP Set
