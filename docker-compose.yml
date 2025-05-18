@@ -17,8 +17,8 @@ services:
       - NODE_ENV=development
       - AUTH_TRUST_HOST=true
       - MONGODB_URI=mongodb://mongodb:27017/53one?ssl=false
-      - NEXTAUTH_URL=http://localhost:5731
-      - ORIGIN=http://localhost:5731
+      - NEXTAUTH_URL=http://localhost:3000
+      - ORIGIN=http://localhost:3000
     depends_on:
       - mongodb
     networks:

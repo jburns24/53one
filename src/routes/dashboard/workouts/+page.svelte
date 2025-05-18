@@ -636,79 +636,89 @@
           <h2 class="text-xl font-bold mb-4">
             Main Lift: {formatLiftName(currentWorkout.mainLift.name)}
           </h2>
-          <div class="overflow-x-auto">
-            <table class="w-full border-collapse">
-              <thead>
+          <div class="">
+            <!-- Container for the table -->
+            <table class="w-full md:border-collapse">
+              <!-- Ensure collapse for desktop borders -->
+              <thead class="hidden md:table-header-group">
                 <tr class="bg-muted/50 border-b border-border">
-                  <th class="px-4 py-2 text-left">Set</th>
-                  <th class="px-4 py-2 text-left">Weight (lbs)</th>
-                  <th class="px-4 py-2 text-left">Reps</th>
-                  <th class="px-4 py-2 text-left">Percentage</th>
-                  <th class="px-4 py-2 text-right">Status</th>
+                  <th class="px-4 py-2 text-left font-medium">Set</th>
+                  <th class="px-4 py-2 text-left font-medium">Weight (lbs)</th>
+                  <th class="px-4 py-2 text-left font-medium">Reps</th>
+                  <th class="px-4 py-2 text-left font-medium">Percentage</th>
+                  <th class="px-4 py-2 text-right font-medium">Status</th>
                 </tr>
               </thead>
               <tbody>
                 {#each currentWorkout.mainLift.sets as set, i}
                   <tr
-                    class="border-b border-border cursor-pointer transition-all duration-200
-                    {isSetCompleted(
+                    class="block md:table-row bg-card rounded-lg shadow-md mb-6 md:bg-transparent md:rounded-none md:shadow-none md:mb-0 md:border-b {isSetCompleted(
                       currentWeek,
                       currentDay,
                       currentWorkout.mainLift.name,
                       i,
                     )
-                      ? 'bg-green-100 dark:bg-green-900/30'
-                      : 'hover:bg-muted/50 dark:hover:bg-muted/20'}"
+                      ? 'border-green-500 border-2 md:border-green-500'
+                      : 'border-border border md:border-border'}"
                   >
-                    <td class="px-4 py-3">{i + 1}</td>
-                    <td class="px-4 py-3 font-bold">{set.weight}</td>
-                    <td class="px-4 py-3">
-                      <span class="flex items-center gap-2">
-                        {set.reps}{i ===
-                          currentWorkout.mainLift.sets.length - 1 &&
-                        currentWeek !== 4
-                          ? "+"
-                          : ""}
-                      </span>
-                    </td>
-                    <td class="px-4 py-3 text-muted-foreground"
-                      >{(set.percentage * 100).toFixed(0)}%</td
+                    <td
+                      class="block md:table-cell px-4 pt-3 pb-2 md:py-3 border-b border-border md:border-0"
                     >
-                    <td class="px-4 py-3 text-right">
+                      <span class="text-sm font-medium text-muted-foreground"
+                        >Set:
+                      </span>
+                      <span class="text-sm font-semibold">{i + 1}</span>
+                    </td>
+                    <td
+                      class="block md:table-cell px-4 pt-2 pb-2 md:py-3 border-b border-border md:border-0"
+                    >
+                      <span class="text-sm font-medium text-muted-foreground"
+                        >Weight (lbs):
+                      </span>
+                      <span class="text-sm font-semibold">{set.weight}</span>
+                    </td>
+                    <td
+                      class="block md:table-cell px-4 pt-2 pb-2 md:py-3 border-b border-border md:border-0"
+                    >
+                      <span class="text-sm font-medium text-muted-foreground"
+                        >Reps:
+                      </span>
+                      <span class="text-sm font-semibold"
+                        >{set.reps}{set.amrap ? "+" : ""}</span
+                      >
+                    </td>
+                    <td
+                      class="block md:table-cell px-4 pt-2 pb-2 md:py-3 border-b border-border md:border-0"
+                    >
+                      <span class="text-sm font-medium text-muted-foreground"
+                        >Percentage:
+                      </span>
+                      <span class="text-sm font-semibold"
+                        >{(set.percentage * 100).toFixed(0)}%</span
+                      >
+                    </td>
+                    <td
+                      class="block md:table-cell px-4 pt-2 pb-3 md:py-3 text-left md:text-right"
+                    >
                       <button
-                        class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors
-                        focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring
-                        disabled:pointer-events-none disabled:opacity-50 h-9 px-3
+                        class="w-full md:w-auto px-4 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors {isSetCompleted(
+                          currentWeek,
+                          currentDay,
+                          currentWorkout.mainLift.name,
+                          i,
+                        )
+                          ? 'bg-green-600 hover:bg-green-700 text-white'
+                          : 'bg-primary hover:bg-primary/90 text-primary-foreground'}"
+                        on:click={() => toggleSetCompletion(i)}
+                      >
                         {isSetCompleted(
                           currentWeek,
                           currentDay,
                           currentWorkout.mainLift.name,
                           i,
                         )
-                          ? 'bg-green-600 text-white hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600'
-                          : 'border border-input bg-background hover:bg-muted/80 hover:text-accent-foreground'}"
-                        on:click={() => toggleSetCompletion(i)}
-                        disabled={isWorkoutCompleted(currentWeek, currentDay)}
-                      >
-                        {#if isSetCompleted(currentWeek, currentDay, currentWorkout.mainLift.name, i)}
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="16"
-                            height="16"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            class="mr-1"
-                          >
-                            <path d="M20 6L9 17l-5-5"></path>
-                          </svg>
-                          Completed
-                        {:else}
-                          Mark Complete
-                        {/if}
+                          ? "Completed"
+                          : "Mark Complete"}
                       </button>
                     </td>
                   </tr>
@@ -937,20 +947,23 @@
 
 {#if showAmrapDialog}
   <div
-    class="fixed inset-0 bg-black/50 dark:bg-black/80 backdrop-blur-sm flex items-center justify-center z-50"
+    class="fixed inset-0 bg-black/50 dark:bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
   >
     <div
-      class="bg-white dark:bg-card text-black dark:text-card-foreground p-6 rounded-lg shadow-xl max-w-md w-full border-2 border-primary/20"
+      class="bg-white dark:bg-card text-black dark:text-card-foreground p-4 sm:p-6 rounded-lg shadow-xl w-full max-w-sm border border-border dark:border-border"
     >
-      <h3 class="text-xl font-bold mb-4 text-primary">Record AMRAP Set</h3>
-      <p class="mb-6 font-medium">
-        How many reps did you complete on your AMRAP set for {currentWorkout?.mainLift
-          ? formatLiftName(currentWorkout.mainLift.name)
-          : ""}?
-      </p>
-
-      <div class="mb-6">
-        <label for="amrap-reps" class="block text-sm font-medium mb-2"
+      <h2 class="text-lg sm:text-xl font-bold mb-4 text-center sm:text-left">
+        Record AMRAP Set
+      </h2>
+      {#if currentWorkout}
+        <p class="mb-4 text-sm sm:text-base">
+          How many reps did you complete on your AMRAP set for {formatLiftName(
+            currentWorkout.mainLift.name,
+          )}?
+        </p>
+      {/if}
+      <div>
+        <label for="amrap-reps" class="block text-sm font-medium mb-1"
           >Number of Reps</label
         >
         <input
@@ -958,25 +971,24 @@
           id="amrap-reps"
           bind:value={amrapRepsInput}
           min="0"
-          class="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-          placeholder="Enter number of reps"
+          class="w-full px-3 py-2 bg-background border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-sm sm:text-base"
+          placeholder="Enter reps"
         />
       </div>
-
-      <div class="flex justify-end gap-4">
+      <div class="mt-6 flex flex-col sm:flex-row sm:justify-end gap-3">
         <button
           type="button"
-          class="px-4 py-2 bg-muted text-muted-foreground rounded-md hover:bg-muted/80"
+          class="w-full sm:w-auto order-2 sm:order-1 px-4 py-2 bg-muted text-muted-foreground rounded-md hover:bg-muted/80 transition-colors text-sm sm:text-base"
           on:click={() => (showAmrapDialog = false)}
         >
           Cancel
         </button>
         <button
           type="button"
-          class="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
+          class="w-full sm:w-auto order-1 sm:order-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors text-sm sm:text-base"
           on:click={saveAmrapReps}
         >
-          Save
+          Save Reps
         </button>
       </div>
     </div>
