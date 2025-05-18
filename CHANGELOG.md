@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.1](https://github.com/jburns24/53one/compare/v2.0.0...v2.0.1) (2025-05-18)
+
+
+### Bug Fixes
+
+* remove some unneeded code and information on the workout page ma… ([#8](https://github.com/jburns24/53one/issues/8)) ([7fcd0b5](https://github.com/jburns24/53one/commit/7fcd0b5a3ef5adfda593a02541da54023c5e879c))
+
 ## [2.0.0](https://github.com/jburns24/53one/compare/v1.1.4...v2.0.0) (2025-04-27)
 
 
