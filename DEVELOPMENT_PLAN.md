@@ -1,4 +1,34 @@
 <context>
+## Project Context
+
+### Key Files
+
+- **[+layout.svelte](src/routes/dashboard/+layout.svelte)**: Main dashboard layout file that affects all pages in the dashboard folder. Features:
+  - Responsive navigation bar with mobile and desktop views
+  - Hamburger menu for mobile navigation that transforms into a fullscreen overlay
+  - Mobile nav shows only the favicon, desktop shows full "53one" logo/text
+  - Theme toggle button for switching between light and dark modes
+  - Sign out button in both mobile and desktop navigation
+  - Body scroll locking when the mobile menu is open
+  - Accessibility features including ARIA attributes and keyboard navigation
+  - Multiple ways to close the menu (hamburger toggle, close button, clicking outside)
+
+- **[workouts/+page.svelte](src/routes/dashboard/workouts/+page.svelte)**: Workout page that displays the user's generated workout plans. Features:
+  - AMRAP modal with responsive design for mobile screens
+  - Reduced padding for mobile displays (`p-2 sm:p-4`)
+  - Adjusted width constraints for better mobile experience (`max-w-xs sm:max-w-sm`)
+
+### Recent Improvements
+
+- **Mobile Navigation**: Created a hamburger menu for improved mobile navigation that shows/hides a fullscreen menu overlay
+- **Mobile Menu Experience**: Enhanced with multiple ways to close the menu, improved background opacity, and better text contrast
+- **AMRAP Modal**: Improved mobile responsiveness with adjusted padding and width constraints
+- **User Interface**: Removed username display from navigation for a cleaner interface
+
+### Current Focus
+
+Continuing to enhance the mobile responsiveness of the application and improve the overall user experience.
+
 ## Project Specifications
 
 **53one Workout App**
