@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.2](https://github.com/jburns24/53one/compare/v2.0.1...v2.0.2) (2025-05-18)
+
+
+### Bug Fixes
+
+* logic for '+' set reworked to show a plus sign on all weeks except the deload week ([e9c959a](https://github.com/jburns24/53one/commit/e9c959a60b311b52ecb875694063163e85f8982f))
+
 ## [2.0.1](https://github.com/jburns24/53one/compare/v2.0.0...v2.0.1) (2025-05-18)
 
 
