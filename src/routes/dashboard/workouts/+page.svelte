@@ -1,10 +1,10 @@
 <script lang="ts">
   import { page } from "$app/stores";
   import type { PageData } from "./$types";
-  import { derived, writable } from "svelte/store";
+  import { writable } from "svelte/store";
   import { Confetti } from "svelte-confetti";
 
-  export let data: PageData;
+  const { data } = $props<{ data: PageData }>();
 
   // Get workout plan data from the server
   let workoutPlan = {
@@ -25,31 +25,33 @@
   };
 
   // Use a plain object for tracking completed sets
-  let completedSets: Record<string, boolean> = {};
+  let completedSets = $state<Record<string, boolean>>({});
 
   // Track AMRAP reps
-  let amrapReps: Record<string, number> = {};
+  let amrapReps = $state<Record<string, number>>({});
 
   // Show/hide AMRAP dialog
-  let showAmrapDialog = false;
-  let amrapRepsInput = 0;
+  let showAmrapDialog = $state(false);
+  let amrapRepsInput = $state(0);
 
   // State for controlling confetti animation
-  let showConfetti = false;
+  let showConfetti = $state(false);
 
   // Show/hide cycle completion dialog
-  let showCycleCompletionDialog = false;
-  let cycleSuccessful = false;
-  let failedWorkouts: Array<{
-    week: number;
-    day: number;
-    lift: string;
-    expected: number;
-    actual: number;
-  }> = [];
+  let showCycleCompletionDialog = $state(false);
+  let cycleSuccessful = $state(false);
+  let failedWorkouts = $state<
+    Array<{
+      week: number;
+      day: number;
+      lift: string;
+      expected: number;
+      actual: number;
+    }>
+  >([]);
 
   // Track workout completion status
-  let workoutCompleted: Record<string, boolean> = {};
+  let workoutCompleted = $state<Record<string, boolean>>({});
 
   // Import onMount for initialization
   import { onMount } from "svelte";
@@ -71,6 +73,33 @@
         workoutCompleted[workoutKey] = true;
       }
     });
+  }
+
+  // Determine the initial week and day to display
+  let initialWeek = 1;
+  let initialDay = 1;
+
+  if (workoutPlan && workoutPlan.weeks) {
+    let foundIncomplete = false;
+    for (let weekIdx = 0; weekIdx < workoutPlan.weeks.length; weekIdx++) {
+      const weekNumber = weekIdx + 1;
+      const weekData = workoutPlan.weeks[weekIdx];
+      if (weekData && weekData.workouts) {
+        for (let dayIdx = 0; dayIdx < weekData.workouts.length; dayIdx++) {
+          const dayNumber = dayIdx + 1;
+          // isWorkoutCompleted function is defined further down in the script
+          if (!isWorkoutCompleted(weekNumber, dayNumber)) {
+            initialWeek = weekNumber;
+            initialDay = dayNumber;
+            foundIncomplete = true;
+            break;
+          }
+        }
+      }
+      if (foundIncomplete) {
+        break;
+      }
+    }
   }
 
   // Function to check if a set is completed
@@ -104,12 +133,12 @@
   }
 
   // Track which lifts met their AMRAP requirements
-  let liftSuccess: Record<string, boolean> = {
+  let liftSuccess = $state<Record<string, boolean>>({
     squat: true,
     bench: true,
     deadlift: true,
     press: true,
-  };
+  });
 
   // Function to check if a specific lift met all its AMRAP requirements
   function didLiftMeetAmrapMinimums(liftName: string): boolean {
@@ -229,22 +258,13 @@
   }
 
   // Current week and day being viewed
-  let currentWeek = 1;
-  let currentDay = 1;
+  let currentWeek = $state(initialWeek);
+  let currentDay = $state(initialDay);
 
   // Get current workout based on selected week and day
-  $: currentWorkout =
-    workoutPlan.weeks?.[currentWeek - 1]?.workouts?.[currentDay - 1] || null;
-
-  // Create a reactive variable to track UI updates
-  let completedSetsArray: Array<{ key: string; completed: boolean }> = [];
-
-  // Reactive statement to rebuild the array when completedSets changes
-  $: {
-    completedSetsArray = Object.entries(completedSets).map(
-      ([key, completed]) => ({ key, completed }),
-    );
-  }
+  let currentWorkout = $derived(
+    workoutPlan.weeks?.[currentWeek - 1]?.workouts?.[currentDay - 1] || null,
+  );
 
   // Function to check if all main lift sets are completed
   function areAllMainLiftsCompleted(): boolean {
