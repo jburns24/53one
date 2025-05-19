@@ -480,6 +480,12 @@
     showCycleCompletionDialog = false;
   }
 
+  // Function to handle AMRAP input focus
+  function handleAmrapInputFocus(event: FocusEvent) {
+    const target = event.target as HTMLInputElement;
+    target.select();
+  }
+
   // Function to toggle set completion status
   async function toggleSetCompletion(setIndex: number) {
     if (!currentWorkout) return;
@@ -733,7 +739,7 @@
                         )
                           ? 'bg-green-600 hover:bg-green-700 text-white'
                           : 'bg-primary hover:bg-primary/90 text-primary-foreground'}"
-                        on:click={() => toggleSetCompletion(i)}
+                        onclick={() => toggleSetCompletion(i)}
                       >
                         {isSetCompleted(
                           currentWeek,
@@ -766,7 +772,7 @@
               <button
                 type="button"
                 class="px-6 py-3 bg-green-600 text-white rounded-md font-medium hover:bg-green-700 transition-colors shadow-md flex items-center justify-center gap-2"
-                on:click={currentWeek === 4
+                onclick={currentWeek === 4
                   ? markWorkoutComplete
                   : showAmrapRepDialog}
               >
@@ -995,6 +1001,8 @@
           id="amrap-reps"
           bind:value={amrapRepsInput}
           min="0"
+          pattern="\\d*"
+          onfocus={handleAmrapInputFocus}
           class="w-full px-3 py-2 bg-background border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-sm sm:text-base"
           placeholder="Enter reps"
         />
@@ -1002,15 +1010,16 @@
       <div class="mt-6 flex flex-col sm:flex-row sm:justify-end gap-3">
         <button
           type="button"
-          class="w-full sm:w-auto order-2 sm:order-1 px-4 py-2 bg-muted text-muted-foreground rounded-md hover:bg-muted/80 transition-colors text-sm sm:text-base"
-          on:click={() => (showAmrapDialog = false)}
+          class="px-4 py-2 bg-muted text-foreground rounded-md hover:bg-muted/80 transition-colors text-sm sm:text-base"
+          onclick={() => (showAmrapDialog = false)}
         >
           Cancel
         </button>
         <button
           type="button"
-          class="w-full sm:w-auto order-1 sm:order-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors text-sm sm:text-base"
-          on:click={saveAmrapReps}
+          class="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors text-sm sm:text-base"
+          onclick={saveAmrapReps}
+          disabled={amrapRepsInput === null || amrapRepsInput < 0}
         >
           Save Reps
         </button>
@@ -1146,14 +1155,14 @@
         <button
           type="button"
           class="px-4 py-2 bg-muted text-muted-foreground rounded-md hover:bg-muted/80"
-          on:click={closeCycleCompletionDialog}
+          onclick={closeCycleCompletionDialog}
         >
           Not Now
         </button>
         <button
           type="button"
           class="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
-          on:click={generateNewWorkoutPlan}
+          onclick={generateNewWorkoutPlan}
         >
           Generate New Plan
         </button>
