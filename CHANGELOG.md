@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.1.0](https://github.com/jburns24/53one/compare/v2.0.2...v2.1.0) (2025-05-19)
+
+
+### Features
+
+* make it so on workout page load the first unfinished workout is selected ([2924d83](https://github.com/jburns24/53one/commit/2924d8358a169096bb1b862ee607c00d054fea38))
+
+
+### Bug Fixes
+
+* update amrap modal to only take numbers and somf QoL changes ([030b3c5](https://github.com/jburns24/53one/commit/030b3c509be1487c98e8bd44fdd3624cedce9e61))
+
 ## [2.0.2](https://github.com/jburns24/53one/compare/v2.0.1...v2.0.2) (2025-05-18)
 
 
